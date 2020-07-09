@@ -84,6 +84,7 @@ class _DefaultFijkPanelState extends State<_DefaultFijkPanel> {
   StreamSubscription _currentPosSubs;
 
   StreamSubscription _bufferPosSubs;
+
   //StreamSubscription _bufferingSubs;
 
   Timer _hideTimer;
@@ -200,7 +201,7 @@ class _DefaultFijkPanelState extends State<_DefaultFijkPanel> {
   AnimatedOpacity _buildBottomBar(BuildContext context) {
     double duration = _duration.inMilliseconds.toDouble();
     double currentValue =
-        _seekPos > 0 ? _seekPos : _currentPos.inMilliseconds.toDouble();
+    _seekPos > 0 ? _seekPos : _currentPos.inMilliseconds.toDouble();
     currentValue = min(currentValue, duration);
     currentValue = max(currentValue, 0);
     return AnimatedOpacity(
@@ -208,7 +209,9 @@ class _DefaultFijkPanelState extends State<_DefaultFijkPanel> {
       duration: Duration(milliseconds: 400),
       child: Container(
         height: barHeight,
-        color: Theme.of(context).dialogBackgroundColor,
+        color: Theme
+            .of(context)
+            .dialogBackgroundColor,
         child: Row(
           children: <Widget>[
             _buildVolumeButton(),
@@ -223,44 +226,44 @@ class _DefaultFijkPanelState extends State<_DefaultFijkPanel> {
             _duration.inMilliseconds == 0
                 ? Expanded(child: Center())
                 : Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(right: 0, left: 0),
-                      child: FijkSlider(
-                        value: currentValue,
-                        cacheValue: _bufferPos.inMilliseconds.toDouble(),
-                        min: 0.0,
-                        max: duration,
-                        onChanged: (v) {
-                          _startHideTimer();
-                          setState(() {
-                            _seekPos = v;
-                          });
-                        },
-                        onChangeEnd: (v) {
-                          setState(() {
-                            player.seekTo(v.toInt());
-                            print("seek to $v");
-                            _currentPos =
-                                Duration(milliseconds: _seekPos.toInt());
-                            _seekPos = -1;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
+              child: Padding(
+                padding: EdgeInsets.only(right: 0, left: 0),
+                child: FijkSlider(
+                  value: currentValue,
+                  cacheValue: _bufferPos.inMilliseconds.toDouble(),
+                  min: 0.0,
+                  max: duration,
+                  onChanged: (v) {
+                    _startHideTimer();
+                    setState(() {
+                      _seekPos = v;
+                    });
+                  },
+                  onChangeEnd: (v) {
+                    setState(() {
+                      player.seekTo(v.toInt());
+                      print("seek to $v");
+                      _currentPos =
+                          Duration(milliseconds: _seekPos.toInt());
+                      _seekPos = -1;
+                    });
+                  },
+                ),
+              ),
+            ),
 
             // duration / position
             _duration.inMilliseconds == 0
                 ? Container(child: const Text("LIVE"))
                 : Padding(
-                    padding: EdgeInsets.only(right: 5.0, left: 5),
-                    child: Text(
-                      '${_duration2String(_duration)}',
-                      style: TextStyle(
-                        fontSize: 14.0,
-                      ),
-                    ),
-                  ),
+              padding: EdgeInsets.only(right: 5.0, left: 5),
+              child: Text(
+                '${_duration2String(_duration)}',
+                style: TextStyle(
+                  fontSize: 14.0,
+                ),
+              ),
+            ),
 
             IconButton(
               icon: Icon(widget.player.value.fullScreen
@@ -286,10 +289,10 @@ class _DefaultFijkPanelState extends State<_DefaultFijkPanel> {
     Rect rect = player.value.fullScreen
         ? Rect.fromLTWH(0, 0, widget.viewSize.width, widget.viewSize.height)
         : Rect.fromLTRB(
-            max(0.0, widget.texturePos.left),
-            max(0.0, widget.texturePos.top),
-            min(widget.viewSize.width, widget.texturePos.right),
-            min(widget.viewSize.height, widget.texturePos.bottom));
+        max(0.0, widget.texturePos.left),
+        max(0.0, widget.texturePos.top),
+        min(widget.viewSize.width, widget.texturePos.right),
+        min(widget.viewSize.height, widget.texturePos.bottom));
     return Positioned.fromRect(
       rect: rect,
       child: GestureDetector(
@@ -311,34 +314,52 @@ class _DefaultFijkPanelState extends State<_DefaultFijkPanel> {
                     child: Center(
                         child: _exception != null
                             ? Text(
-                                _exception,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 25,
-                                ),
-                              )
+                          _exception,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 25,
+                          ),
+                        )
                             : (_prepared ||
-                                    player.state == FijkState.initialized)
-                                ? AnimatedOpacity(
-                                    opacity: _hideStuff ? 0.0 : 0.7,
-                                    duration: Duration(milliseconds: 400),
-                                    child: IconButton(
-                                        iconSize: barHeight * 2,
-                                        icon: Icon(
-                                            _playing
-                                                ? Icons.pause
-                                                : Icons.play_arrow,
-                                            color: Colors.white),
-                                        padding: EdgeInsets.only(
-                                            left: 10.0, right: 10.0),
-                                        onPressed: _playOrPause))
-                                : SizedBox(
-                                    width: barHeight * 1.5,
-                                    height: barHeight * 1.5,
-                                    child: CircularProgressIndicator(
-                                        valueColor: AlwaysStoppedAnimation(
-                                            Colors.white)),
-                                  )),
+                            player.state == FijkState.initialized)
+                            ? AnimatedOpacity(
+                            opacity: _hideStuff ? 0.0 : 0.7,
+                            duration: Duration(milliseconds: 400),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                IconButton(
+                                  onPressed: rewind10,
+                                  icon: Icon(Icons.replay_10),
+                                  color: Colors.white,
+                                iconSize: 42,),
+                                const SizedBox(width: 15),
+                                IconButton(
+                                    iconSize: barHeight * 2,
+                                    icon: Icon(
+                                        _playing
+                                            ? Icons.pause
+                                            : Icons.play_arrow,
+                                        color: Colors.white),
+                                    padding: EdgeInsets.only(
+                                        left: 10.0, right: 10.0),
+                                    onPressed: _playOrPause),
+                                const SizedBox(width: 15),
+                                IconButton(
+                                  onPressed: forward10,
+                                  icon: Icon(Icons.forward_10),
+                                  color: Colors.white,
+                                  iconSize: 42,
+                                ),
+                              ],
+                            ))
+                            : SizedBox(
+                          width: barHeight * 1.5,
+                          height: barHeight * 1.5,
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation(
+                                Colors.white),),
+                        )),
                   ),
                 ),
               ),
@@ -348,5 +369,15 @@ class _DefaultFijkPanelState extends State<_DefaultFijkPanel> {
         ),
       ),
     );
+  }
+
+  void rewind10() {
+    final newDuration = _currentPos.inMilliseconds - 10000;
+    player?.seekTo(newDuration);
+  }
+
+  void forward10() {
+    final newDuration = _currentPos.inMilliseconds + 10000;
+    player?.seekTo(newDuration);
   }
 }
